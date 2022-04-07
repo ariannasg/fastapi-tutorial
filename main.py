@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import FastAPI
 
-from models import ModelName
+from models import Item, ModelName
 
 app = FastAPI()
 
@@ -10,6 +10,20 @@ app = FastAPI()
 @app.get("/")
 def root():
     return {"message": "Hello World"}
+
+
+@app.post("/items/")
+def create_item(item: Item):
+    return item
+
+
+@app.post("/items/derived_attrs")
+def create_item_derived_attrs(item: Item):
+    item_dict = item.dict()
+    if item.tax:
+        price_with_tax = item.price + item.tax
+        item_dict.update({"price_with_tax": price_with_tax})
+    return item_dict
 
 
 @app.get("/items/")
@@ -40,6 +54,11 @@ def read_item_optional_and_bool(
     if include_description:
         item.update({"description": "This item includes a description"})
     return item
+
+
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.dict()}
 
 
 @app.get("/users/me")
