@@ -12,6 +12,8 @@ from models import (
     ModelName,
     Offer,
     User,
+    UserIn,
+    UserOut,
 )
 
 tutorial_app = FastAPI()
@@ -242,6 +244,61 @@ def read_items_with_duplicated_headers(x_token: Optional[List[str]] = Header(Non
     return {"X-Token values": x_token}
 
 
+@tutorial_app.get(
+    "/items_response_model_exclude_unset/{item_id}",
+    response_model=Item,
+    response_model_exclude_unset=True,
+)
+def read_items_response_model_exclude_unset(item_id: str):
+    items = {
+        "foo": {"name": "Foo", "price": 50.2},
+        "bar": {
+            "name": "Bar",
+            "description": "The bartenders",
+            "price": 3.2,
+            "tax": 20.2,
+        },
+        "baz": {"name": "Baz", "description": None, "price": 4.2, "tax": 10.5},
+    }
+    return items[item_id]
+
+
+@tutorial_app.get(
+    "/items/{item_id}/name",
+    response_model=Item,
+    response_model_include={"name"},
+)
+def read_item_name(item_id: str):
+    items = {
+        "foo": {"name": "Foo", "price": 50.2},
+        "bar": {
+            "name": "Bar",
+            "description": "The bartenders",
+            "price": 3.2,
+            "tax": 20.2,
+        },
+        "baz": {"name": "Baz", "description": None, "price": 4.2, "tax": 10.5},
+    }
+    return items[item_id]
+
+
+@tutorial_app.get(
+    "/items/{item_id}/public", response_model=Item, response_model_exclude={"tax"}
+)
+def read_item_public_data(item_id: str):
+    items = {
+        "foo": {"name": "Foo", "price": 50.2},
+        "bar": {
+            "name": "Bar",
+            "description": "The bartenders",
+            "price": 3.2,
+            "tax": 20.2,
+        },
+        "baz": {"name": "Baz", "description": None, "price": 4.2, "tax": 10.5},
+    }
+    return items[item_id]
+
+
 @tutorial_app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item):
     return {"item_id": item_id, **item.dict()}
@@ -393,6 +450,11 @@ def read_user_item(
     if include_description:
         item.update({"description": "This item includes a description"})
     return item
+
+
+@tutorial_app.post("/user_with_limited_response_model/", response_model=UserOut)
+def create_user_with_limited_response_model(user: UserIn):
+    return user
 
 
 @tutorial_app.get("/models/{model_name}")

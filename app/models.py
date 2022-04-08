@@ -51,3 +51,14 @@ class Offer(BaseModel):
     description: Optional[str] = None
     price: float
     items: List[ItemWithNestedModel]
+
+
+class UserIn(BaseModel):
+    username: str
+    password: str
+    full_name: Optional[str] = None
+
+
+class UserOut(BaseModel):
+    username: str
+    full_name: Optional[str] = None
