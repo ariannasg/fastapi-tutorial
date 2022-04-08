@@ -2,7 +2,19 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from fastapi import Body, Cookie, FastAPI, Form, Header, Path, Query, status
+from fastapi import (
+    Body,
+    Cookie,
+    FastAPI,
+    File,
+    Form,
+    Header,
+    Path,
+    Query,
+    status,
+    UploadFile,
+)
+from fastapi.responses import HTMLResponse
 
 from models import (
     CarItem,
@@ -24,7 +36,19 @@ tutorial_app = FastAPI()
 
 @tutorial_app.get("/")
 def root():
-    return {"message": "Hello World"}
+    content = """
+    <body>
+    <form action="/files/" enctype="multipart/form-data" method="post">
+    <input name="files" type="file" multiple>
+    <input type="submit">
+    </form>
+    <form action="/uploadfiles/" enctype="multipart/form-data" method="post">
+    <input name="files" type="file" multiple>
+    <input type="submit">
+    </form>
+    </body>
+    """
+    return HTMLResponse(content=content)
 
 
 @tutorial_app.post("/items/")
@@ -495,6 +519,32 @@ def get_model(model_name: ModelName):
         return {"model_name": model_name, "message": "LeCNN all the images"}
 
     return {"model_name": model_name, "message": "Have some residuals"}
+
+
+@tutorial_app.post("/file/")
+def create_file(file: bytes = File(...)):
+    return {"file_size": len(file)}
+
+
+@tutorial_app.post("/uploadfile/")
+def create_upload_file(
+    file: UploadFile = File(..., description="A file read as UploadFile")
+):
+    return {"filename": file.filename}
+
+
+@tutorial_app.post("/files/")
+def create_multiple_files(
+    files: List[bytes] = File(..., description="Multiple files as bytes")
+):
+    return {"file_sizes": [len(file) for file in files]}
+
+
+@tutorial_app.post("/uploadfiles/")
+def create_upload_files(
+    files: List[UploadFile] = File(..., description="Multiple files as UploadFile")
+):
+    return {"filenames": [file.filename for file in files]}
 
 
 @tutorial_app.get("/files/{file_path:path}")
