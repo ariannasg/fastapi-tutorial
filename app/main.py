@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from fastapi import Body, Cookie, FastAPI, Header, Path, Query
+from fastapi import Body, Cookie, FastAPI, Header, Path, Query, status
 
 from models import (
     CarItem,
@@ -39,6 +39,11 @@ def create_item_derived_attrs(item: Item):
         price_with_tax = item.price + item.tax
         item_dict.update({"price_with_tax": price_with_tax})
     return item_dict
+
+
+@tutorial_app.post("/items_status_code/", status_code=status.HTTP_201_CREATED)
+def create_item_status_code(name: str):
+    return {"name": name}
 
 
 @tutorial_app.get("/items/")
@@ -433,7 +438,7 @@ def read_items_extra_datatypes(
 @tutorial_app.get(
     "/items_planet_or_car/{item_id}", response_model=Union[PlaneItem, CarItem]
 )
-async def read_item_planet_or_car(item_id: str):
+def read_item_planet_or_car(item_id: str):
     items = {
         "item1": {"description": "All my friends drive a low rider", "type": "car"},
         "item2": {
