@@ -22,6 +22,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from starlette.background import BackgroundTasks
 
 from exceptions import UnicornException
 from models import (
@@ -47,6 +48,7 @@ from models import (
     UserIn,
     UserOut,
 )
+from tasks import write_notification
 
 tutorial_app = FastAPI()
 
@@ -764,3 +766,9 @@ async def add_process_time_header(request: Request, call_next):
     process_time = t.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response
+
+
+@tutorial_app.post("/send-notification/{email}")
+def send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message="some notification")
+    return {"message": "Notification sent in the background"}
