@@ -4,7 +4,7 @@ install:
 
 .PHONY: run
 run:
-	uvicorn main:app --reload
+	cd ./app && uvicorn main:tutorial_app --reload
 
 .PHONY: black
 black:
@@ -12,7 +12,7 @@ black:
 
 .PHONY: lint
 lint:
-	pylint ./
+	pylint ./app --rcfile=./.pylintrc
 
 .PHONY: security
 security:

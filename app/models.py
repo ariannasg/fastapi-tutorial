@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 
 class ModelName(str, Enum):
-    alexnet = "alexnet"
-    resnet = "resnet"
-    lenet = "lenet"
+    ALEXNET = "alexnet"
+    RESNET = "resnet"
+    LENET = "lenet"
 
 
 class Item(BaseModel):
