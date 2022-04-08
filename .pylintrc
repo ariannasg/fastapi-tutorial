@@ -97,7 +97,8 @@ disable=raw-checker-failed,
         too-few-public-methods,
         missing-module-docstring,
         import-error,
-        missing-function-docstring
+        missing-function-docstring,
+        line-too-long
 
 
 # Enable the message, report, category or checker with the given id(s). You can

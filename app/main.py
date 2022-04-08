@@ -530,13 +530,23 @@ def create_file(file: bytes = File(...)):
 def create_upload_file(
     file: UploadFile = File(..., description="A file read as UploadFile")
 ):
+    """
+    Using UploadFile has several advantages over bytes:
+    You don't have to use File() in the default value of the parameter.
+    It uses a "spooled" file:
+    A file stored in memory up to a maximum size limit, and after passing this limit it will be stored in disk.
+    This means that it will work well for large files like images, videos, large binaries, etc. without consuming all
+    the memory.
+    You can get metadata from the uploaded file.
+    It has a file-like async interface.
+    It exposes an actual Python SpooledTemporaryFile object that you can pass directly to other libraries that expect
+    a file-like object.
+    """
     return {"filename": file.filename}
 
 
 @tutorial_app.post("/files/")
-def create_multiple_files(
-    files: List[bytes] = File(..., description="Multiple files as bytes")
-):
+def create_files(files: List[bytes] = File(..., description="Multiple files as bytes")):
     return {"file_sizes": [len(file) for file in files]}
 
 
@@ -545,6 +555,17 @@ def create_upload_files(
     files: List[UploadFile] = File(..., description="Multiple files as UploadFile")
 ):
     return {"filenames": [file.filename for file in files]}
+
+
+@tutorial_app.post("/file_and_form/")
+def create_file_and_form(
+    file: bytes = File(...), fileb: UploadFile = File(...), token: str = Form(...)
+):
+    return {
+        "file_size": len(file),
+        "token": token,
+        "fileb_content_type": fileb.content_type,
+    }
 
 
 @tutorial_app.get("/files/{file_path:path}")
@@ -572,5 +593,5 @@ def create_index_weights(weights: Dict[str, float]):
 
 
 @tutorial_app.post("/login/")
-def login(username: str = Form(...), password: str = Form(...)):
+def login(username: str = Form(...)):
     return {"username": username}
