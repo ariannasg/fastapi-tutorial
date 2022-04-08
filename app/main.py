@@ -9,13 +9,18 @@ from fastapi import (
     File,
     Form,
     Header,
+    HTTPException,
     Path,
     Query,
+    Request,
     status,
     UploadFile,
 )
-from fastapi.responses import HTMLResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse, JSONResponse
 
+from exceptions import UnicornException
 from models import (
     CarItem,
     fake_save_user,
@@ -474,6 +479,14 @@ def read_item_planet_or_car(item_id: str):
     return items[item_id]
 
 
+@tutorial_app.get("/items_handling_error/{item_id}")
+def read_item_handling_error(item_id: str):
+    items = {"foo": "The Foo Wrestlers"}
+    if item_id not in items:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"item": items[item_id]}
+
+
 @tutorial_app.get("/users/me")
 def read_user_me():
     return {"user_id": "the current user"}
@@ -595,3 +608,31 @@ def create_index_weights(weights: Dict[str, float]):
 @tutorial_app.post("/login/")
 def login(username: str = Form(...)):
     return {"username": username}
+
+
+@tutorial_app.exception_handler(UnicornException)
+def unicorn_exception_handler(request: Request, exc: UnicornException):
+    print(request, exc)
+    return JSONResponse(
+        status_code=status.HTTP_418_IM_A_TEAPOT,
+        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+    )
+
+
+@tutorial_app.get("/unicorns/{name}")
+def read_unicorn(name: str):
+    if name == "yolo":
+        raise UnicornException(name=name)
+    return {"unicorn_name": name}
+
+
+@tutorial_app.exception_handler(RequestValidationError)
+def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Override request validation exceptions to include what was sent as "body"
+    """
+    print(request, exc)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": exc.errors(), "body": exc.body}),
+    )
