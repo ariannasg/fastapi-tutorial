@@ -1,8 +1,16 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import Body, FastAPI, Path, Query
 
-from models import Item, ItemWithFields, ModelName, User
+from models import (
+    Image,
+    Item,
+    ItemWithFields,
+    ItemWithNestedModel,
+    ModelName,
+    Offer,
+    User,
+)
 
 tutorial_app = FastAPI()
 
@@ -247,6 +255,14 @@ def update_item_with_fields(
     return results
 
 
+@tutorial_app.put("/items_with_nested_model/{item_id}")
+def update_item_with_nested_model(
+    item_id: int, item_with_nested_model: ItemWithNestedModel
+):
+    results = {"item_id": item_id, "item_with_nested_model": item_with_nested_model}
+    return results
+
+
 @tutorial_app.get("/users/me")
 def read_user_me():
     return {"user_id": "the current user"}
@@ -290,3 +306,18 @@ def read_file(file_path: str):
     {'file_path': '/home/johndoe/myfile.txt'}
     """
     return {"file_path": file_path}
+
+
+@tutorial_app.post("/offers/")
+def create_offer(offer: Offer):
+    return offer
+
+
+@tutorial_app.post("/images/multiple/")
+def create_multiple_images(images: List[Image]):
+    return images
+
+
+@tutorial_app.post("/index-weights/")
+def create_index_weights(weights: Dict[str, float]):
+    return weights

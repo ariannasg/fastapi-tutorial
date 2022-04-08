@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class ModelName(str, Enum):
@@ -29,3 +29,23 @@ class ItemWithFields(BaseModel):
     )
     price: float = Field(..., gt=0, description="The price must be greater than zero")
     tax: Optional[float] = None
+
+
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
+
+
+class ItemWithNestedModel(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+    image: Optional[Image] = None
+
+
+class Offer(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    items: List[ItemWithNestedModel]
