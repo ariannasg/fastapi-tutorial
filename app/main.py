@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from fastapi import Body, Cookie, FastAPI, Path, Query
+from fastapi import Body, Cookie, FastAPI, Header, Path, Query
 
 from models import (
     Image,
@@ -213,9 +213,33 @@ def items_path_validation(
     results = {"item_id": item_id, "required_str": required_str}
     return results
 
+
 @tutorial_app.get("/items_with_cookies/")
 def read_items_with_cookies(ads_id: Optional[str] = Cookie(None)):
     return {"ads_id": ads_id}
+
+
+@tutorial_app.get("/items_with_headers/")
+def read_items_with_headers(
+    user_agent: Optional[str] = Header(None, include_in_schema=False)
+):
+    """
+    By default, Header will convert the parameter names characters from underscore (_)
+    to hyphen (-) to extract and document the headers.
+    """
+    return {"User-Agent": user_agent}
+
+
+@tutorial_app.get("/items_headers_without_conversion/")
+def read_items_headers_without_conversion(
+    strange_header: Optional[str] = Header(None, convert_underscores=False)
+):
+    return {"strange_header": strange_header}
+
+
+@tutorial_app.get("/items_with_duplicated_headers/")
+def read_items_with_duplicated_headers(x_token: Optional[List[str]] = Header(None)):
+    return {"X-Token values": x_token}
 
 
 @tutorial_app.put("/items/{item_id}")
