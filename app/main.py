@@ -3,6 +3,7 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
+import uvicorn
 from fastapi import (
     BackgroundTasks,
     Body,
@@ -24,8 +25,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from app.exceptions import UnicornException
-from app.models import (
+from exceptions import UnicornException
+from models import (
     AuthUser,
     AuthUserInDB,
     CarItem,
@@ -48,7 +49,7 @@ from app.models import (
     UserIn,
     UserOut,
 )
-from app.tasks import write_notification
+from tasks import write_notification
 
 tutorial_app = FastAPI()
 
@@ -772,3 +773,6 @@ async def add_process_time_header(request: Request, call_next):
 def send_notification(email: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(write_notification, email, message="some notification")
     return {"message": "Notification sent in the background"}
+
+if __name__ == "__main__":
+    uvicorn.run(tutorial_app, host="0.0.0.0", port=8000)

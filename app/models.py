@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, HttpUrl
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Session
 
-from app.database import Base
+from database import Base
 
 
 class ModelName(str, Enum):

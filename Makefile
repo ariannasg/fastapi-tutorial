@@ -20,4 +20,4 @@ security:
 
 .PHONY: test
 test:
-	pytest ./app
+	pytest tests
