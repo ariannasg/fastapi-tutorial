@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from fastapi import Body, Cookie, FastAPI, Header, Path, Query, status
+from fastapi import Body, Cookie, FastAPI, Form, Header, Path, Query, status
 
 from models import (
     CarItem,
@@ -519,3 +519,8 @@ def create_multiple_images(images: List[Image]):
 @tutorial_app.post("/index-weights/")
 def create_index_weights(weights: Dict[str, float]):
     return weights
+
+
+@tutorial_app.post("/login/")
+def login(username: str = Form(...), password: str = Form(...)):
+    return {"username": username}
