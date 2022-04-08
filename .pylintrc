@@ -98,7 +98,13 @@ disable=raw-checker-failed,
         missing-module-docstring,
         import-error,
         missing-function-docstring,
-        line-too-long
+        line-too-long,
+        unspecified-encoding,
+        invalid-name,
+        inconsistent-return-statements,
+        super-init-not-called,
+        redefined-builtin,
+        redefined-outer-name
 
 
 # Enable the message, report, category or checker with the given id(s). You can

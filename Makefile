@@ -20,4 +20,4 @@ security:
 
 .PHONY: test
 test:
-	pytest tests
+	pytest tests  # TODO: fix ModuleNotFoundError

@@ -739,7 +739,7 @@ def get_current_active_user(current_user: AuthUser = Depends(get_current_user)):
 
 
 @tutorial_app.post("/token")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+def token(form_data: OAuth2PasswordRequestForm = Depends()):
     user_dict = fake_users_db.get(form_data.username)
     if not user_dict:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -773,6 +773,7 @@ async def add_process_time_header(request: Request, call_next):
 def send_notification(email: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(write_notification, email, message="some notification")
     return {"message": "Notification sent in the background"}
+
 
 if __name__ == "__main__":
     uvicorn.run(tutorial_app, host="0.0.0.0", port=8000)
