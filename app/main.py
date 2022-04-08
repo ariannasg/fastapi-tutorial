@@ -1,16 +1,19 @@
 from datetime import datetime, time, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from fastapi import Body, Cookie, FastAPI, Header, Path, Query
 
 from models import (
+    CarItem,
+    fake_save_user,
     Image,
     Item,
     ItemWithFields,
     ItemWithNestedModel,
     ModelName,
     Offer,
+    PlaneItem,
     User,
     UserIn,
     UserOut,
@@ -427,6 +430,21 @@ def read_items_extra_datatypes(
     }
 
 
+@tutorial_app.get(
+    "/items_planet_or_car/{item_id}", response_model=Union[PlaneItem, CarItem]
+)
+async def read_item_planet_or_car(item_id: str):
+    items = {
+        "item1": {"description": "All my friends drive a low rider", "type": "car"},
+        "item2": {
+            "description": "Music is my aeroplane, it's my aeroplane",
+            "type": "plane",
+            "size": 5,
+        },
+    }
+    return items[item_id]
+
+
 @tutorial_app.get("/users/me")
 def read_user_me():
     return {"user_id": "the current user"}
@@ -455,6 +473,12 @@ def read_user_item(
 @tutorial_app.post("/user_with_limited_response_model/", response_model=UserOut)
 def create_user_with_limited_response_model(user: UserIn):
     return user
+
+
+@tutorial_app.post("/user_in_fake_db/", response_model=UserOut)
+def create_user_in_fake_db(user_in: UserIn):
+    user_saved = fake_save_user(user_in)
+    return user_saved
 
 
 @tutorial_app.get("/models/{model_name}")

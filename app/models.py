@@ -53,12 +53,43 @@ class Offer(BaseModel):
     items: List[ItemWithNestedModel]
 
 
-class UserIn(BaseModel):
+class UserBase(BaseModel):
     username: str
+    full_name: Optional[str] = None
+
+
+class UserIn(UserBase):
     password: str
-    full_name: Optional[str] = None
 
 
-class UserOut(BaseModel):
-    username: str
-    full_name: Optional[str] = None
+class UserOut(UserBase):
+    pass
+
+
+class UserInDB(UserBase):
+    hashed_password: str
+
+
+def fake_password_hasher(raw_password: str):
+    return "supersecret" + raw_password
+
+
+def fake_save_user(user_in: UserIn):
+    hashed_password = fake_password_hasher(user_in.password)
+    user_in_db = UserInDB(**user_in.dict(), hashed_password=hashed_password)
+    print(f"User saved with hashed_password pwd: {hashed_password} ...not really")
+    return user_in_db
+
+
+class BaseItem(BaseModel):
+    description: str
+    type: str
+
+
+class CarItem(BaseItem):
+    type = "car"
+
+
+class PlaneItem(BaseItem):
+    type = "plane"
+    size: int
