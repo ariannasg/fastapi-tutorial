@@ -1,3 +1,4 @@
+import time as t
 from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional, Union
 from uuid import UUID
@@ -24,7 +25,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from exceptions import UnicornException
 from models import (
-    AuthUser, AuthUserInDB,
+    AuthUser,
+    AuthUserInDB,
     CarItem,
     CommonQueryParams,
     fake_decode_token,
@@ -749,3 +751,16 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @tutorial_app.get("/current_user")
 def read_current_user(current_user: AuthUser = Depends(get_current_active_user)):
     return current_user
+
+
+@tutorial_app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    """
+    A "middleware" is a function that works with every request before it is processed by any specific path operation.
+     And also with every response before returning it.
+    """
+    start_time = t.time()
+    response = await call_next(request)
+    process_time = t.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
