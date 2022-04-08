@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from fastapi import Body, FastAPI, Path, Query
 
-from models import Item, ModelName, User
+from models import Item, ItemWithFields, ModelName, User
 
 tutorial_app = FastAPI()
 
@@ -236,6 +236,14 @@ def update_item_extra_body_param(
 @tutorial_app.put("/items_embedded/{item_id}")
 def update_item_embedded(item_id: int, embedded_item: Item = Body(..., embed=True)):
     results = {"item_id": item_id, "embedded_item": embedded_item}
+    return results
+
+
+@tutorial_app.put("/items_with_fields/{item_id}")
+def update_item_with_fields(
+    item_id: int, item_with_fields: ItemWithFields = Body(..., embed=True)
+):
+    results = {"item_id": item_id, "item": item_with_fields}
     return results
 
 
