@@ -27,7 +27,9 @@ class ItemWithFields(BaseModel):
     description: Optional[str] = Field(
         None, title="The description of the item", max_length=300
     )
-    price: float = Field(..., gt=0, description="The price must be greater than zero")
+    price: float = Field(
+        ..., gt=0, description="The price must be greater than zero", example=0.4
+    )
     tax: Optional[float] = None
 
 

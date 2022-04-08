@@ -196,7 +196,7 @@ def read_items_path_metadata(
 def read_items_path_order(
     *,
     item_id: int = Path(..., description="The ID of the item to get"),
-    required_str: str
+    required_str: str,
 ):
     results = {"item_id": item_id, "required_str": required_str}
     return results
@@ -206,7 +206,7 @@ def read_items_path_order(
 def items_path_validation(
     *,
     item_id: int = Path(..., description="The ID of the item to get", ge=1, lt=10),
-    required_str: str
+    required_str: str,
 ):
     results = {"item_id": item_id, "required_str": required_str}
     return results
@@ -260,6 +260,62 @@ def update_item_with_nested_model(
     item_id: int, item_with_nested_model: ItemWithNestedModel
 ):
     results = {"item_id": item_id, "item_with_nested_model": item_with_nested_model}
+    return results
+
+
+@tutorial_app.put("/items_with_example/{item_id}")
+def update_item_with_example(
+    item_id: int,
+    item: Item = Body(
+        ...,
+        example={
+            "name": "Foo",
+            "description": "A very nice Item",
+            "price": 35.4,
+            "tax": 3.2,
+        },
+    ),
+):
+    results = {"item_id": item_id, "item": item}
+    return results
+
+
+@tutorial_app.put("/items_with_multiple_examples/{item_id}")
+def update_item_with_multiple_examples(
+    *,
+    item_id: int,
+    item: Item = Body(
+        ...,
+        examples={
+            "normal": {
+                "summary": "A normal example",
+                "description": "A **normal** item works correctly.",
+                "value": {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                },
+            },
+            "converted": {
+                "summary": "An example with converted data",
+                "description": "FastAPI can convert price `strings` to actual `numbers` automatically",
+                "value": {
+                    "name": "Bar",
+                    "price": "35.4",
+                },
+            },
+            "invalid": {
+                "summary": "Invalid data is rejected with an error",
+                "value": {
+                    "name": "Baz",
+                    "price": "thirty five point four",
+                },
+            },
+        },
+    ),
+):
+    results = {"item_id": item_id, "item": item}
     return results
 
 
