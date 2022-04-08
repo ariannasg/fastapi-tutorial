@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 
 from models import Item, ModelName
 
@@ -32,15 +32,15 @@ def read_items(skip: int = 0, limit: int = 10):
     return fake_items_db[skip : skip + limit]
 
 
-@tutorial_app.get("/items/required_max_length")
-def read_items_required_max_length(required_str: str = Query(..., max_length=3)):
+@tutorial_app.get("/items_params/required_max_length")
+def read_items_params_required_max_length(required_str: str = Query(..., max_length=3)):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     results.update({"required_str": required_str})
     return results
 
 
-@tutorial_app.get("/items/optional_max_length")
-def read_items_optional_max_length(
+@tutorial_app.get("/items_params/optional_max_length")
+def read_items_params_optional_max_length(
     optional_str: Optional[str] = Query(None, max_length=3)
 ):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
@@ -49,8 +49,8 @@ def read_items_optional_max_length(
     return results
 
 
-@tutorial_app.get("/items/regex")
-def read_items_optional_regex(
+@tutorial_app.get("/items_params_optional_regex")
+def read_items_params_optional_regex(
     optional_str: Optional[str] = Query(
         None, min_length=3, max_length=50, regex="^fixedoptional_str$"
     )
@@ -61,8 +61,8 @@ def read_items_optional_regex(
     return results
 
 
-@tutorial_app.get("/items/regex/default")
-def read_items_optional_regex_default(
+@tutorial_app.get("/items_params_regex_default")
+def read_items_params_regex_default(
     optional_str: Optional[str] = Query(
         "fixedoptional_str",
         min_length=3,
@@ -76,20 +76,22 @@ def read_items_optional_regex_default(
     return results
 
 
-@tutorial_app.get("/items/optional_list")
-def read_items_optional_list(optional_str: Optional[List[str]] = Query(None)):
+@tutorial_app.get("/items_params/optional_list")
+def read_items_params_optional_list(optional_str: Optional[List[str]] = Query(None)):
     optional_str = {"optional_str": optional_str}
     return optional_str
 
 
-@tutorial_app.get("/items/default_list_typing")
-def read_items_default_list_typing(required_str_str: List[str] = Query(["foo", "bar"])):
+@tutorial_app.get("/items_params/default_list_typing")
+def read_items_params_default_list_typing(
+    required_str_str: List[str] = Query(["foo", "bar"])
+):
     required_str_str_items = {"required_str_str": required_str_str}
     return required_str_str_items
 
 
-@tutorial_app.get("/items/required_str_list_native")
-def read_items_required_str_list_native(
+@tutorial_app.get("/items_params/required_str_list_native")
+def read_items_params_required_str_list_native(
     required_str_str: list = Query([]),
 ):
     optional_str_items = {"required_str_str": required_str_str}
@@ -120,8 +122,8 @@ def read_item_optional_and_bool(
     return item
 
 
-@tutorial_app.get("/items_metadata")
-def read_items_metadata_and_validation(
+@tutorial_app.get("/items_params_metadata_and_validation")
+def read_items_params_metadata_and_validation(
     required_str: str = Query(
         ...,
         title="Query string",
@@ -138,8 +140,8 @@ def read_items_metadata_and_validation(
     return results
 
 
-@tutorial_app.get("/items_alias")
-def read_items_alias(required_str: str = Query(..., alias="item-query")):
+@tutorial_app.get("/items_params_alias")
+def read_items_params_alias(required_str: str = Query(..., alias="item-query")):
     results = {
         "items": [
             {"item_id": "Foo"},
@@ -150,8 +152,8 @@ def read_items_alias(required_str: str = Query(..., alias="item-query")):
     return results
 
 
-@tutorial_app.get("/items_deprecated")
-def read_items_deprecated(required_str: str = Query(..., deprecated=True)):
+@tutorial_app.get("/items_params_deprecated")
+def read_items_params_deprecated(required_str: str = Query(..., deprecated=True)):
     results = {
         "items": [
             {"item_id": "Foo"},
@@ -162,13 +164,44 @@ def read_items_deprecated(required_str: str = Query(..., deprecated=True)):
     return results
 
 
-@tutorial_app.get("/items_hidden_in_openapi")
-def read_items_hidden_in_openapi(
+@tutorial_app.get("/items_params_hidden_in_openapi")
+def read_items_params_hidden_in_openapi(
     hidden_query: Optional[str] = Query(None, include_in_schema=False)
 ):
     if hidden_query:
         return {"hidden_query": hidden_query}
     return {"hidden_query": "Not found"}
+
+
+@tutorial_app.get("/items_path_metadata/{item_id}")
+def read_items_path_metadata(
+    item_id: int = Path(..., description="The ID of the item to get"),
+    optional_str: Optional[str] = Query(None, alias="item-query"),
+):
+    results = {"item_id": item_id}
+    if optional_str:
+        results.update({"optional_str": optional_str})
+    return results
+
+
+@tutorial_app.get("/items_path_order/{item_id}")
+def read_items_path_order(
+    *,
+    item_id: int = Path(..., description="The ID of the item to get"),
+    required_str: str
+):
+    results = {"item_id": item_id, "required_str": required_str}
+    return results
+
+
+@tutorial_app.get("/items_path_validation/{item_id}")
+def items_path_validation(
+    *,
+    item_id: int = Path(..., description="The ID of the item to get", ge=1, lt=10),
+    required_str: str
+):
+    results = {"item_id": item_id, "required_str": required_str}
+    return results
 
 
 @tutorial_app.put("/items/{item_id}")
