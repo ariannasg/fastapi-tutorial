@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from fastapi import Body, FastAPI, Path, Query
+from fastapi import Body, Cookie, FastAPI, Path, Query
 
 from models import (
     Image,
@@ -212,6 +212,10 @@ def items_path_validation(
 ):
     results = {"item_id": item_id, "required_str": required_str}
     return results
+
+@tutorial_app.get("/items_with_cookies/")
+def read_items_with_cookies(ads_id: Optional[str] = Cookie(None)):
+    return {"ads_id": ads_id}
 
 
 @tutorial_app.put("/items/{item_id}")
