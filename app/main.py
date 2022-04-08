@@ -1,8 +1,8 @@
 from typing import List, Optional
 
-from fastapi import FastAPI, Path, Query
+from fastapi import Body, FastAPI, Path, Query
 
-from models import Item, ModelName
+from models import Item, ModelName, User
 
 tutorial_app = FastAPI()
 
@@ -207,6 +207,36 @@ def items_path_validation(
 @tutorial_app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item):
     return {"item_id": item_id, **item.dict()}
+
+
+@tutorial_app.put("/items_multiple_models/{item_id}")
+def update_item_multiple_models(item_id: int, item: Item, user: User):
+    results = {"item_id": item_id, "item": item, "user": user}
+    return results
+
+
+@tutorial_app.put("/items_extra_body_param/{item_id}")
+def update_item_extra_body_param(
+    item_id: int,
+    item: Item,
+    user: User,
+    extra_required_int_param: int = Body(
+        ..., description="Extra required body parameter"
+    ),
+):
+    results = {
+        "item_id": item_id,
+        "item": item,
+        "user": user,
+        "extra_required_int_param": extra_required_int_param,
+    }
+    return results
+
+
+@tutorial_app.put("/items_embedded/{item_id}")
+def update_item_embedded(item_id: int, embedded_item: Item = Body(..., embed=True)):
+    results = {"item_id": item_id, "embedded_item": embedded_item}
+    return results
 
 
 @tutorial_app.get("/users/me")
