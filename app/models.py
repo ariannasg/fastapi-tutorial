@@ -3,6 +3,10 @@ from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, HttpUrl
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Session
+
+from database import Base
 
 
 class ModelName(str, Enum):
@@ -163,3 +167,23 @@ def fake_decode_token(token):
     # Check the next version
     user = get_user(fake_users_db, token)
     return user
+
+
+class SQLUser(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+
+
+def get_sql_user(db: Session, user_id: int):
+    return db.query(SQLUser).filter(SQLUser.id == user_id).first()
+
+
+def get_sql_user_by_email(db: Session, email: str):
+    return db.query(SQLUser).filter(SQLUser.email == email).first()
+
+
+def get_users(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(SQLUser).offset(skip).limit(limit).all()
