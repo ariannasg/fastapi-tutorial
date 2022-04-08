@@ -30,7 +30,9 @@ from models import (
     ItemWithNestedModel,
     ModelName,
     Offer,
+    Pet,
     PlaneItem,
+    Tags,
     User,
     UserIn,
     UserOut,
@@ -608,6 +610,52 @@ def create_index_weights(weights: Dict[str, float]):
 @tutorial_app.post("/login/")
 def login(username: str = Form(...)):
     return {"username": username}
+
+
+@tutorial_app.get("/tags/", tags=[Tags.endpoint_with_tag_1])
+def read_endpoint_with_tag():
+    return {"username": "johndoe"}
+
+
+@tutorial_app.get("/tags/{username}", tags=[Tags.endpoint_with_tag_1])
+def read_endpoint_with_param_and_tag(username: str):
+    return {"username": username}
+
+
+@tutorial_app.get("/tags2/", tags=[Tags.endpoint_with_tag_2])
+def read_endpoint_with_tag_2():
+    return {"username": "johndoe2"}
+
+
+@tutorial_app.post(
+    "/pets/",
+    response_model=Pet,
+    summary="Create a pet",
+    description="Create a pet with all the information, type and name",
+)
+def create_pet(pet: Pet):
+    return pet
+
+
+@tutorial_app.post(
+    "/pets_docstring/",
+    response_model=Pet,
+    summary="Create a pet",
+    response_description="The created pet",
+)
+def create_pet_docstring(pet: Pet):
+    """
+    Create a pet with all the information:
+
+    - **type**: each pet must have a type, e.g: dog, cat, etc
+    - **name**: each pet must have a name
+    """
+    return pet
+
+
+@tutorial_app.get("/pets/", deprecated=True)
+def read_pets():
+    return [{"pet": "cat"}]
 
 
 @tutorial_app.exception_handler(UnicornException)

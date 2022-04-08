@@ -93,3 +93,13 @@ class CarItem(BaseItem):
 class PlaneItem(BaseItem):
     type = "plane"
     size: int
+
+
+class Tags(Enum):
+    endpoint_with_tag_1 = "Tag 1"
+    endpoint_with_tag_2 = "Tag 2"
+
+
+class Pet(BaseModel):
+    type: str
+    name: str
