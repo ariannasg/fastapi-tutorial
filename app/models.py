@@ -117,3 +117,49 @@ class CommonQueryParams:
         self.q = q
         self.skip = skip
         self.limit = limit
+
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "fakehashedsecret",
+        "disabled": False,
+    },
+    "alice": {
+        "username": "alice",
+        "full_name": "Alice Wonderson",
+        "email": "alice@example.com",
+        "hashed_password": "fakehashedsecret2",
+        "disabled": True,
+    },
+}
+
+
+class AuthUser(BaseModel):
+    username: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    disabled: Optional[bool] = None
+
+
+class AuthUserInDB(AuthUser):
+    hashed_password: str
+
+
+def fake_hash_password(password: str):
+    return "fakehashed" + password
+
+
+def get_user(db, username: str):
+    if username in db:
+        user_dict = db[username]
+        return AuthUserInDB(**user_dict)
+
+
+def fake_decode_token(token):
+    # This doesn't provide any security at all
+    # Check the next version
+    user = get_user(fake_users_db, token)
+    return user
