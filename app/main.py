@@ -26,6 +26,7 @@ from models import (
     fake_save_user,
     Image,
     Item,
+    ItemWithDatetime,
     ItemWithFields,
     ItemWithNestedModel,
     ModelName,
@@ -612,17 +613,17 @@ def login(username: str = Form(...)):
     return {"username": username}
 
 
-@tutorial_app.get("/tags/", tags=[Tags.endpoint_with_tag_1])
+@tutorial_app.get("/tags/", tags=[Tags.ENDPOINT_WITH_TAG_1])
 def read_endpoint_with_tag():
     return {"username": "johndoe"}
 
 
-@tutorial_app.get("/tags/{username}", tags=[Tags.endpoint_with_tag_1])
+@tutorial_app.get("/tags/{username}", tags=[Tags.ENDPOINT_WITH_TAG_1])
 def read_endpoint_with_param_and_tag(username: str):
     return {"username": username}
 
 
-@tutorial_app.get("/tags2/", tags=[Tags.endpoint_with_tag_2])
+@tutorial_app.get("/tags2/", tags=[Tags.ENDPOINT_WITH_TAG_2])
 def read_endpoint_with_tag_2():
     return {"username": "johndoe2"}
 
@@ -656,6 +657,14 @@ def create_pet_docstring(pet: Pet):
 @tutorial_app.get("/pets/", deprecated=True)
 def read_pets():
     return [{"pet": "cat"}]
+
+
+@tutorial_app.put("/item_with_datetime/{id}")
+def update_item_with_datetime(id: str, item_with_datetime: ItemWithDatetime):
+    fake_db = {}
+    json_compatible_item_data = jsonable_encoder(item_with_datetime)
+    fake_db[id] = json_compatible_item_data
+    return json_compatible_item_data
 
 
 @tutorial_app.exception_handler(UnicornException)

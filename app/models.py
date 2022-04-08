@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
@@ -96,10 +97,16 @@ class PlaneItem(BaseItem):
 
 
 class Tags(Enum):
-    endpoint_with_tag_1 = "Tag 1"
-    endpoint_with_tag_2 = "Tag 2"
+    ENDPOINT_WITH_TAG_1 = "Tag 1"
+    ENDPOINT_WITH_TAG_2 = "Tag 2"
 
 
 class Pet(BaseModel):
     type: str
     name: str
+
+
+class ItemWithDatetime(BaseModel):
+    title: str
+    timestamp: datetime
+    description: Optional[str] = None
