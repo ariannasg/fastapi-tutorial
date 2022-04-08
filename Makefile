@@ -17,3 +17,7 @@ lint:
 .PHONY: security
 security:
 	safety check
+
+.PHONY: test
+test:
+	pytest ./app

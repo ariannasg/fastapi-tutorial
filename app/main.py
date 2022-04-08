@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from fastapi import (
+    BackgroundTasks,
     Body,
     Cookie,
     Depends,
@@ -22,10 +23,9 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from starlette.background import BackgroundTasks
 
-from exceptions import UnicornException
-from models import (
+from app.exceptions import UnicornException
+from app.models import (
     AuthUser,
     AuthUserInDB,
     CarItem,
@@ -48,7 +48,7 @@ from models import (
     UserIn,
     UserOut,
 )
-from tasks import write_notification
+from app.tasks import write_notification
 
 tutorial_app = FastAPI()
 
