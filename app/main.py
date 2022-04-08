@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import (
     Body,
     Cookie,
+    Depends,
     FastAPI,
     File,
     Form,
@@ -23,6 +24,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from exceptions import UnicornException
 from models import (
     CarItem,
+    CommonQueryParams,
     fake_save_user,
     Image,
     Item,
@@ -82,6 +84,17 @@ def create_item_status_code(name: str):
 def read_items(skip: int = 0, limit: int = 10):
     fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
     return fake_items_db[skip : skip + limit]
+
+
+@tutorial_app.get("/items_with_depends/")
+def read_items_with_depends(commons: CommonQueryParams = Depends()):
+    fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+    response = {}
+    if commons.q:
+        response.update({"q": commons.q})
+    items = fake_items_db[commons.skip : commons.skip + commons.limit]
+    response.update({"items": items})
+    return response
 
 
 @tutorial_app.get("/items_params/required_max_length")
